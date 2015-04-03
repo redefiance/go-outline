@@ -11,7 +11,7 @@ type File struct {
 	Decls []Decl
 }
 
-func ParseFile(filepath string, file *ast.File, exportedOnly bool) File {
+func (p Package) parseFile(filepath string, file *ast.File, exportedOnly bool) File {
 	f := File{Path: filepath}
 
 	exported := func(name string) bool {
@@ -23,6 +23,13 @@ func ParseFile(filepath string, file *ast.File, exportedOnly bool) File {
 		switch e := d.(type) {
 		case *ast.BadDecl:
 		case *ast.GenDecl:
+			if e.Doc != nil {
+				decl.LineFrom = p.fs.Position(e.Doc.Pos()).Line
+			} else {
+				decl.LineFrom = p.fs.Position(e.Pos()).Line
+			}
+			decl.LineTo = p.fs.Position(e.End()).Line
+
 			switch e.Tok {
 			case token.IMPORT:
 				// decl.Token = "import"
@@ -74,6 +81,13 @@ func ParseFile(filepath string, file *ast.File, exportedOnly bool) File {
 		case *ast.FuncDecl:
 			decl.Token = "func"
 			if !exportedOnly || exported(e.Name.Name) {
+				if e.Doc != nil {
+					decl.LineFrom = p.fs.Position(e.Doc.Pos()).Line
+				} else {
+					decl.LineFrom = p.fs.Position(e.Pos()).Line
+				}
+				decl.LineTo = p.fs.Position(e.End()).Line
+
 				decl.Vars = append(decl.Vars, Variable{
 					Name: e.Name.Name,
 					Type: nil,

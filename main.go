@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go/parser"
 	"go/token"
 	"os"
 	"path"
@@ -12,7 +11,7 @@ import (
 	"github.com/redefiance/go-outline/outline"
 )
 
-var fPath = flag.String("path", "/home/dev/go/go-outline/testpkg", "TODO desc")
+var fPath = flag.String("path", "/home/stargazer/dev/go/go-outline/testpkg", "TODO desc")
 var fPublic = flag.Bool("public", true, "show only package exports")
 
 var fs = token.NewFileSet()
@@ -22,22 +21,16 @@ func main() {
 
 	var doFolder func(string)
 	doFolder = func(dirpath string) {
-		pkgs, err := parser.ParseDir(fs, dirpath, nil, 0)
+		pkg, err := outline.ParsePackage(dirpath, *fPublic)
 		if err != nil {
 			panic(err)
 		}
 
-		for pkgname, pkg := range pkgs {
-			if strings.HasSuffix(pkgname, "_test") {
-				continue
-			}
-
-			fmt.Println("pkg", strings.TrimLeft(strings.TrimLeft(dirpath, *fPath), "/"))
-			for _, file := range outline.ParsePackage(pkg, *fPublic).Files {
-				fmt.Println("file", file.Path)
-				for _, decl := range file.Decls {
-					fmt.Println(decl)
-				}
+		fmt.Println("pkg", strings.TrimLeft(strings.TrimLeft(dirpath, *fPath), "/"))
+		for _, file := range pkg.Files {
+			fmt.Println("file", file.Path)
+			for _, decl := range file.Decls {
+				fmt.Printf("%s:%d:%d\n", decl, decl.LineFrom, decl.LineTo)
 			}
 		}
 

@@ -5,11 +5,11 @@ import (
 	"strings"
 )
 
-type DeclType string
-
 type Decl struct {
 	Token string
 	Vars  []Variable
+
+	LineFrom, LineTo int
 }
 
 func (decl Decl) String() string {

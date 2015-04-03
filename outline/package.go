@@ -1,19 +1,52 @@
 package outline
 
-import "go/ast"
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"strings"
+)
 
 type Package struct {
-	Scope
+	Name  string
+	Path  string
+	Scope Scope
 	Files []File
+
+	ast *ast.Package
+	fs  *token.FileSet
 }
 
-func ParsePackage(p *ast.Package, exportedOnly bool) Package {
+func ParsePackage(dirpath string, exportedOnly bool) (Package, error) {
 	pkg := Package{}
-	for filename, f := range p.Files {
-		pkg.Files = append(pkg.Files, ParseFile(filename, f, exportedOnly))
+	pkg.Path = dirpath
+	pkg.fs = token.NewFileSet()
+
+	asts, err := parser.ParseDir(pkg.fs, dirpath, nil, 0)
+	if err != nil {
+		return pkg, err
 	}
 
-	return pkg
+	for pkgname, pkgast := range asts {
+		if strings.HasSuffix(pkgname, "_test") {
+			continue
+		}
+
+		if pkg.Name != "" {
+			return pkg, fmt.Errorf("Found multiple packages %s, %s in %s",
+				pkg.Name, pkgname, dirpath)
+		}
+
+		pkg.Name = pkgname
+		pkg.ast = pkgast
+	}
+
+	for filename, f := range pkg.ast.Files {
+		pkg.Files = append(pkg.Files, pkg.parseFile(filename, f, exportedOnly))
+	}
+
+	return pkg, nil
 
 	// p := &Package{}
 	//
