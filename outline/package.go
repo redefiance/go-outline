@@ -42,7 +42,14 @@ func ParsePackage(dirpath string, exportedOnly bool) (Package, error) {
 		pkg.ast = pkgast
 	}
 
+	if pkg.ast == nil {
+		return pkg, fmt.Errorf("no package found in %s", dirpath)
+	}
+
 	for filename, f := range pkg.ast.Files {
+		if strings.HasSuffix(filename, "_test.go") {
+			continue
+		}
 		pkg.Files = append(pkg.Files, pkg.parseFile(filename, f, exportedOnly))
 	}
 

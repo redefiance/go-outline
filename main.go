@@ -6,7 +6,6 @@ import (
 	"go/token"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/redefiance/go-outline/outline"
 )
@@ -23,14 +22,14 @@ func main() {
 	doFolder = func(dirpath string) {
 		pkg, err := outline.ParsePackage(dirpath, *fPublic)
 		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println("pkg", strings.TrimLeft(strings.TrimLeft(dirpath, *fPath), "/"))
-		for _, file := range pkg.Files {
-			fmt.Println("file", file.Path)
-			for _, decl := range file.Decls {
-				fmt.Printf("%s:%d:%d\n", decl, decl.LineFrom, decl.LineTo)
+			// fmt.Println(err)
+		} else {
+			fmt.Println("pkg", pkg.Path[len(*fPath):])
+			for _, file := range pkg.Files {
+				fmt.Println("file", file.Path)
+				for _, decl := range file.Decls {
+					fmt.Printf("%s:%d:%d\n", decl, decl.LineFrom, decl.LineTo)
+				}
 			}
 		}
 

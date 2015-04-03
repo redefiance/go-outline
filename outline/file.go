@@ -1,6 +1,7 @@
 package outline
 
 import (
+	"fmt"
 	"go/ast"
 	"go/token"
 	"strings"
@@ -88,8 +89,17 @@ func (p Package) parseFile(filepath string, file *ast.File, exportedOnly bool) F
 				}
 				decl.LineTo = p.fs.Position(e.End()).Line
 
+				n := e.Name.Name
+				if e.Recv != nil {
+					switch id := e.Recv.List[0].Type.(type) {
+					case *ast.StarExpr:
+						n = fmt.Sprintf("(%s).%s", id.X.(*ast.Ident).Name, n)
+					case *ast.Ident:
+						n = fmt.Sprintf("(%s).%s", id.Name, n)
+					}
+				}
 				decl.Vars = append(decl.Vars, Variable{
-					Name: e.Name.Name,
+					Name: n,
 					Type: nil,
 				})
 			}
