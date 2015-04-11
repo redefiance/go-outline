@@ -1,5 +1,7 @@
 package testpkg
 
+// IsAnInt has a
+// multiline comment
 type IsAnInt int
 
 type IsAnArrayOfComplex128 []complex128

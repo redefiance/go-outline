@@ -8,14 +8,22 @@ import (
 	"strings"
 )
 
+// Package describes all files in a go package
 type Package struct {
 	Name  string
 	Path  string
-	Scope Scope
 	Files []File
 
 	ast *ast.Package
 	fs  *token.FileSet
+}
+
+func (p Package) String() string {
+	s := ""
+	for _, f := range p.Files {
+		s += f.String()
+	}
+	return fmt.Sprintf("pkg %s\n%s", p.Path, s)
 }
 
 func ParsePackage(dirpath string, exportedOnly bool) (Package, error) {
@@ -23,7 +31,7 @@ func ParsePackage(dirpath string, exportedOnly bool) (Package, error) {
 	pkg.Path = dirpath
 	pkg.fs = token.NewFileSet()
 
-	asts, err := parser.ParseDir(pkg.fs, dirpath, nil, 0)
+	asts, err := parser.ParseDir(pkg.fs, dirpath, nil, parser.ParseComments)
 	if err != nil {
 		return pkg, err
 	}

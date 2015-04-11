@@ -10,7 +10,7 @@ import (
 	"github.com/redefiance/go-outline/outline"
 )
 
-var fPath = flag.String("path", "/home/stargazer/dev/go/go-outline/testpkg", "TODO desc")
+var fPath = flag.String("path", "testpkg", "TODO desc")
 var fPublic = flag.Bool("public", true, "show only package exports")
 
 var fs = token.NewFileSet()
@@ -38,13 +38,7 @@ func main() {
 		if err != nil {
 			// fmt.Println(err)
 		} else {
-			fmt.Println("pkg", pkg.Path)
-			for _, file := range pkg.Files {
-				fmt.Println("file", file.Path)
-				for _, decl := range file.Decls {
-					fmt.Printf("%s:%d:%d\n", decl, decl.LineFrom, decl.LineTo)
-				}
-			}
+			fmt.Println(pkg)
 		}
 	}
 	doFolder(*fPath)
