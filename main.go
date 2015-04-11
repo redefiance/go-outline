@@ -20,6 +20,20 @@ func main() {
 
 	var doFolder func(string)
 	doFolder = func(dirpath string) {
+		f, err := os.Open(dirpath)
+		if err != nil {
+			panic(err)
+		}
+		fis, err := f.Readdir(0)
+		if err != nil {
+			panic(err)
+		}
+		for _, fi := range fis {
+			if fi.IsDir() {
+				doFolder(path.Join(dirpath, fi.Name()))
+			}
+		}
+
 		pkg, err := outline.ParsePackage(dirpath, *fPublic)
 		if err != nil {
 			// fmt.Println(err)
@@ -30,22 +44,6 @@ func main() {
 				for _, decl := range file.Decls {
 					fmt.Printf("%s:%d:%d\n", decl, decl.LineFrom, decl.LineTo)
 				}
-			}
-		}
-
-		f, err := os.Open(dirpath)
-		if err != nil {
-			panic(err)
-		}
-
-		fis, err := f.Readdir(0)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, fi := range fis {
-			if fi.IsDir() {
-				doFolder(path.Join(dirpath, fi.Name()))
 			}
 		}
 	}
