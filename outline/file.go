@@ -91,12 +91,17 @@ func (p Package) parseFile(filepath string, file *ast.File, exportedOnly bool) F
 
 				n := e.Name.Name
 				if e.Recv != nil {
+					rcv := ""
 					switch id := e.Recv.List[0].Type.(type) {
 					case *ast.StarExpr:
-						n = fmt.Sprintf("(%s).%s", id.X.(*ast.Ident).Name, n)
+						rcv = id.X.(*ast.Ident).Name
 					case *ast.Ident:
-						n = fmt.Sprintf("(%s).%s", id.Name, n)
+						rcv = id.Name
 					}
+					if !exported(rcv) {
+						continue
+					}
+					n = fmt.Sprintf("(%s).%s", rcv, n)
 				}
 				decl.Vars = append(decl.Vars, Variable{
 					Name: n,
