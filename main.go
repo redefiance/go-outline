@@ -11,7 +11,7 @@ import (
 )
 
 var fPath = flag.String("path", "testpkg", "TODO desc")
-var fPublic = flag.Bool("public", true, "show only package exports")
+var fPublic = flag.Bool("public", false, "show only package exports")
 
 var fs = token.NewFileSet()
 

@@ -33,3 +33,5 @@ type IsAStruct struct {
 }
 
 type IsAFunc func(in1, in2 string) (out string, err error)
+
+const notExported = "i am private"
