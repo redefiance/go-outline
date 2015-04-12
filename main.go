@@ -38,7 +38,7 @@ func main() {
 		if err != nil {
 			// fmt.Println(err)
 		} else {
-			fmt.Println(pkg)
+			fmt.Print(pkg)
 		}
 	}
 	doFolder(*fPath)
